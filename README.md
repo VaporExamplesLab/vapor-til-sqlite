@@ -15,6 +15,8 @@ The [vapor-til-sqlite]() is based on [vapor-til](https://github.com/raywenderlic
 * SQLite pivot `id` type is `Int` instead of `UUID`.
 * TBD: Tests pass on Linux 16.04?
 * Swift script to populate database.
+* `Imperial` package and related files for OAth login are commented out.
+* Demo user: `admin`:`password`
 
 ## PostgreSQL → SQLite Conversion <a id="PostgreSQLToSQLite">[▴](#toc)</a>
 
@@ -97,65 +99,9 @@ databases.add(database: sqliteDb, as: .sqlite)
 services.register(databases)
 ```
 
-
-## Additions
-
-**Authentication**
-
-Adds public to `user.swift`.
-
-``` swift
-import Authentication
-
-
-final class User: Codable {
-    var id: UUID?
-    var name: String
-    var username: String
-  var password: String
-    
-    init(name: String, username: String, password: String) {
-        self.name = name
-        self.username = username
-        self.password = password
-  }
-
-    final class Public: Codable {
-        var id: UUID?
-        var name: String
-        var username: String
-
-        init(id: UUID?, name: String, username: String) {
-            self.id = id
-            self.name = name
-            self.username = username
-        }
-    }
-}
-```
-
-Adds file `Models/Token.swift`
-
 ## Notes
 
-**`vapor-til-sqlite`** original
-
-* `LinuxMain.swift` not empty. 
-    * :TODO: check tests on Linux 
-    
-* Tests/
-    * does not have `AppTests.swift` which does nothing.
-    * does have `AcronymTests.swift`, `CategoryTests.swift`, `UserTests.swift`, `Application+Testable.swift`, `Models+Testable.swift`
-    * :TODO: check tests with SQLite
-    
-## Comments <a id="Comments">[▴](#toc)</a>
-
-## Unresolved <a id="Unresolved">[▴](#toc)</a>
-
-`Package.swift`
-
-* .package(url: "https://github.com/vapor/crypto.git", from: "3.1.2"), not present. :TODO:???: Not needed?
-* .target(… dependencies: […, "Crypto", "Random"]), not present. :TODO:???: Not needed?
+**`vapor-til-sqlite`** has not yet been tested on Linux.
 
 ## Resources <a id="Resources">[▴](#toc)</a>
 

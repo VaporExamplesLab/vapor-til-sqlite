@@ -35,7 +35,6 @@ final class Token: Codable {
   var id: UUID?
   var token: String
   var userID: User.ID
-
   init(token: String, userID: User.ID) {
     self.token = token
     self.userID = userID
@@ -43,7 +42,17 @@ final class Token: Codable {
 }
 
 extension Token: SQLiteUUIDModel {}
-extension Token: Migration {}
+
+// :WAS: extension Token: Migration {}
+extension Token: Migration {
+  static func prepare(on connection: SQLiteConnection) -> Future<Void> {
+    return Database.create(self, on: connection) { builder in
+      try addProperties(to: builder)
+      builder.reference(from: \.userID, to: \User.id)
+    }
+  }
+}
+
 extension Token: Content {}
 
 extension Token {

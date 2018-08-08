@@ -50,4 +50,8 @@ public func routes(_ router: Router) throws {
     
     let websiteController = WebsiteController()
     try router.register(collection: websiteController)
+
+    // :IMPERIAL: let imperialController = ImperialController()
+    // :IMPERIAL: try router.register(collection: imperialController)
+
 }

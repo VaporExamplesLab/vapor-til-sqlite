@@ -58,20 +58,17 @@ final class User: Codable {
 
 extension User: SQLiteUUIDModel {}
 extension User: Content {}
-extension User.Public: Content {}
-extension User: Parameter {}
-extension User: PasswordAuthenticatable {}
-extension User: SessionAuthenticatable {}
-
 extension User: Migration {
     static func prepare(on connection: SQLiteConnection) -> Future<Void> {
         return Database.create(self, on: connection) { builder in
             try addProperties(to: builder)
-            // 'addIndex(to:isUnique:)' is deprecated: renamed to 'unique(on:)'
             builder.unique(on: \.username)
         }
     }
 }
+
+extension User: Parameter {}
+extension User.Public: Content {}
 
 extension User {
     var acronyms: Children<User, Acronym> {
@@ -120,3 +117,5 @@ struct AdminUser: Migration {
     }
 }
 
+extension User: PasswordAuthenticatable {}
+extension User: SessionAuthenticatable {}

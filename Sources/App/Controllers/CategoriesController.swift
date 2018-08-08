@@ -54,10 +54,10 @@ struct CategoriesController: RouteCollection {
     }
     
     func getAcronymsHandler(_ req: Request) throws -> Future<[Acronym]> {
-        let a: EventLoopFuture<Category> = try req.parameters.next(Category.self)
+        let a: Future<Category> = try req.parameters.next(Category.self)
         let b = a.flatMap(to: [Acronym].self) {
-            // (category: Category) -> EventLoopFuture<T>
-            (category: Category) -> EventLoopFuture<[Acronym]> in
+            // (category: Category) -> Future<T>
+            (category: Category) -> Future<[Acronym]> in
             try category.acronyms.query(on: req).all()
         }
         return b

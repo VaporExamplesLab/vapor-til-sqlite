@@ -89,7 +89,8 @@ public func configure(
     
     // Configure the rest of your application here
     var commandConfig = CommandConfig.default()
-    commandConfig.use(RevertCommand.self, as: "revert")
+    // :WAS: commandConfig.use(RevertCommand.self, as: "revert")
+    commandConfig.useFluentCommands()
     services.register(commandConfig)
     
     config.prefer(LeafRenderer.self, for: ViewRenderer.self)

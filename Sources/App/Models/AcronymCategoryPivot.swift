@@ -33,7 +33,7 @@ import Vapor
 //final class AcronymCategoryPivot: SQLiteUUIDPivot {
 //    var id: UUID?
 
-final class AcronymCategoryPivot: SQLitePivot {
+final class AcronymCategoryPivot: SQLitePivot, ModifiablePivot {
     var id: Int?
     var acronymID: Acronym.ID
     var categoryID: Category.ID
@@ -43,9 +43,14 @@ final class AcronymCategoryPivot: SQLitePivot {
     static let leftIDKey: LeftIDKey = \.acronymID
     static let rightIDKey: RightIDKey = \.categoryID
     
-    init(_ acronymID: Acronym.ID, _ categoryID: Category.ID) {
-        self.acronymID = acronymID
-        self.categoryID = categoryID
+    //init(_ acronymID: Acronym.ID, _ categoryID: Category.ID) {
+    //    self.acronymID = acronymID
+    //    self.categoryID = categoryID
+    //}
+
+    init(_ acronym: Acronym, _ category: Category) throws {
+      self.acronymID = try acronym.requireID()
+      self.categoryID = try category.requireID()
     }
 }
 
@@ -56,9 +61,9 @@ extension AcronymCategoryPivot: Migration {
 
             // 'addReference(from:to:actions:)' is deprecated: renamed to 'reference(from:to:onUpdate:onDelete:)'
             // try builder.addReference(from: \.acronymID, to: \Acronym.id)
-            builder.reference(from: \.acronymID, to: \Acronym.id)
+            builder.reference(from: \.acronymID, to: \Acronym.id, onDelete: .cascade)
             // try builder.addReference(from: \.categoryID, to: \Category.id)
-            builder.reference(from: \.categoryID, to: \Category.id)
+            builder.reference(from: \.categoryID, to: \Category.id, onDelete: .cascade)
         }
     }
 }

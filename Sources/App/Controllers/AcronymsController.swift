@@ -27,7 +27,7 @@
 /// THE SOFTWARE.
 
 import Vapor
-import Fluent
+import FluentSQLite // :EDIT:ADD: for SQLiteDatabase
 import Authentication
 
 struct AcronymsController: RouteCollection {
@@ -48,6 +48,7 @@ struct AcronymsController: RouteCollection {
         tokenAuthGroup.delete(Acronym.parameter, use: deleteHandler)
         tokenAuthGroup.put(Acronym.parameter, use: updateHandler)
         tokenAuthGroup.post(Acronym.parameter, "categories", Category.parameter, use: addCategoriesHandler)
+        tokenAuthGroup.delete(Acronym.parameter, "categories", Category.parameter, use: removeCategoriesHandler)
     }
     
     func getAllHandler(_ req: Request) throws -> Future<[Acronym]> {
@@ -80,11 +81,21 @@ struct AcronymsController: RouteCollection {
     
     func searchHandler(_ req: Request) throws -> Future<[Acronym]> {
         guard let searchTerm = req.query[String.self, at: "term"] else {
-            throw Abort(.badRequest)
+            throw Abort(.badRequest, reason: "Missing search term in request")
         }
-        return Acronym.query(on: req).group(.or) { or in
-            or.filter(\.short == searchTerm)
-            or.filter(\.long == searchTerm)
+        // :MEC:NOTE: uses Swift Key Paths `\type_name.path`
+        // .query(on: DatabaseConnectable)
+        // .group(relation: SQLiteBinaryOperator)
+        // { (QueryBuilder<SQLiteDatabase, Acronym>) in code}
+        return Acronym.query(on: req).group(.or) { 
+            (or: QueryBuilder<SQLiteDatabase, Acronym>) in
+            // .filter(filter: SQLiteExpression)
+            // .filter(value: FilterOperator<SQLiteDatabase, Acronym>) <-- this one
+            // .filter(key: KeyPath<Acronym, Encodable>, method: SQLiteBinaryOperator, value: Encodable)
+            //// either given acronym, find long term
+            or.filter(\Acronym.short == searchTerm) // \.short
+            //// or given long term, find acronym
+            or.filter(\Acronym.long == searchTerm) // \.long
             }.all()
     }
     
@@ -109,14 +120,21 @@ struct AcronymsController: RouteCollection {
     
     func addCategoriesHandler(_ req: Request) throws -> Future<HTTPStatus> {
         return try flatMap(to: HTTPStatus.self, req.parameters.next(Acronym.self), req.parameters.next(Category.self)) { acronym, category in
-            let pivot = try AcronymCategoryPivot(acronym.requireID(), category.requireID())
-            return pivot.save(on: req).transform(to: .created)
+            //let pivot = try AcronymCategoryPivot(acronym.requireID(), category.requireID())
+            //return pivot.save(on: req).transform(to: .created)
+            return acronym.categories.attach(category, on: req).transform(to: .created)
         }
     }
     
     func getCategoriesHandler(_ req: Request) throws -> Future<[Category]> {
         return try req.parameters.next(Acronym.self).flatMap(to: [Category].self) { acronym in
             try acronym.categories.query(on: req).all()
+        }
+    }
+
+    func removeCategoriesHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        return try flatMap(to: HTTPStatus.self, req.parameters.next(Acronym.self), req.parameters.next(Category.self)) { acronym, category in
+            return acronym.categories.detach(category, on: req).transform(to: .noContent)
         }
     }
 }
