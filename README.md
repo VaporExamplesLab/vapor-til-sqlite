@@ -9,7 +9,7 @@
 
 ## Overview <a id="Overview">[▴](#toc)</a>
 
-The [vapor-til-sqlite]() is based on [vapor-til](https://github.com/raywenderlich/vapor-til). Some key aspects of `vapor-til-sqlite` are:
+The [vapor-til-sqlite]() is based on [raywenderlich/vapor-til](https://github.com/raywenderlich/vapor-til). Some key aspects of `vapor-til-sqlite` are:
 
 * SQLite is used instead of PostgreSQL. 
 * SQLite pivot `id` type is `Int` instead of `UUID`.
