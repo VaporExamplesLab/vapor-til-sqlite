@@ -58,11 +58,19 @@ public func configure(
     
     // Configure a database
     var storage: SQLiteStorage!  
+    //print("Environment (env): \(env)")
+    //print("ProcessInfo (environment): \(ProcessInfo.processInfo.environment)")
     switch env {
     case .development:
         // default: "/tmp/db.sqlite"
-        let sqlitePath = "/Volumes/gMediaHD/VaporProjects/workspace/databases/vapor-til-sqlite.sqlite"
-        storage = .file(path: sqlitePath)
+        // exported absolute VAPOR_DATABASE_HOME path
+        if let databaseHomePath = Environment.get("VAPOR_DATABASE_HOME") {
+            let sqlitePath = "\(databaseHomePath)/vapor-til-sqlite.db"
+            storage =  .file(path: sqlitePath)
+        }
+        else {
+            storage = .memory
+        }
     case .testing:
         // "/tmp/_swift-tmp.sqlite"
         storage = .memory
@@ -89,8 +97,7 @@ public func configure(
     
     // Configure the rest of your application here
     var commandConfig = CommandConfig.default()
-    // :WAS: commandConfig.use(RevertCommand.self, as: "revert")
-    commandConfig.useFluentCommands()
+    commandConfig.useFluentCommands() // "revert", "migrate"
     services.register(commandConfig)
     
     config.prefer(LeafRenderer.self, for: ViewRenderer.self)
