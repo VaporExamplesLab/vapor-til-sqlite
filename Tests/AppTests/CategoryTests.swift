@@ -48,6 +48,7 @@ final class CategoryTests : XCTestCase {
     override func tearDown() {
         print("•• UserTests tearDown()")
         conn.close()
+        try? app.syncShutdownGracefully()
     }
     
     func testCategoriesCanBeRetrievedFromAPI() throws {

@@ -47,6 +47,7 @@ final class AcronymTests : XCTestCase {
     
     override func tearDown() {
         conn.close()
+        try? app.syncShutdownGracefully()
     }
     
     func testAcronymsCanBeRetrievedFromAPI() throws {
@@ -117,7 +118,7 @@ final class AcronymTests : XCTestCase {
     
     func testSearchAcronymShort() throws {
         let acronym = try Acronym.create(short: acronymShort, long: acronymLong, on: conn)
-        let acronyms = try app.getResponse(to: "\(acronymsURI)?term=OMG", decodeTo: [Acronym].self)
+        let acronyms = try app.getResponse(to: "\(acronymsURI)search?term=OMG", decodeTo: [Acronym].self)
         
         XCTAssertEqual(acronyms.count, 1)
         XCTAssertEqual(acronyms[0].id, acronym.id)
@@ -127,7 +128,7 @@ final class AcronymTests : XCTestCase {
     
     func testSearchAcronymLong() throws {
         let acronym = try Acronym.create(short: acronymShort, long: acronymLong, on: conn)
-        let acronyms = try app.getResponse(to: "\(acronymsURI)?term=Oh+My+God", decodeTo: [Acronym].self)
+        let acronyms = try app.getResponse(to: "\(acronymsURI)search?term=Oh+My+God", decodeTo: [Acronym].self)
         
         XCTAssertEqual(acronyms.count, 1)
         XCTAssertEqual(acronyms[0].id, acronym.id)

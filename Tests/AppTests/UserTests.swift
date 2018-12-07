@@ -49,6 +49,7 @@ final class UserTests : XCTestCase {
     override func tearDown() {
         print("•• UserTests tearDown()")
         conn.close()
+        try? app.syncShutdownGracefully()
     }
     
     func testUsersCanBeRetrievedFromAPI() throws {
